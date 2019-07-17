@@ -10,9 +10,14 @@ jobs:
             chmod +x ./kind
             sudo mv ./kind /usr/local/bin/kind
       - run:
+          name: Start Kind
+          command: |
+            - kind create cluster
+      - run:
           name: Install kubectl
           command: |
             curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
             chmod +x ./kubectl
             sudo mv ./kubectl /usr/local/bin/kubectl
+            export KUBECONFIG=$(kind get kubeconfig-path)
             kubectl version
