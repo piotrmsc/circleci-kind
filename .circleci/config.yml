@@ -21,3 +21,20 @@ jobs:
             sudo mv ./kubectl /usr/local/bin/kubectl
             export KUBECONFIG=$(kind get kubeconfig-path)
             kubectl version
+  test:
+    docker:
+      - image: circleci/golang:1.12            
+    steps:            
+      - run: echo "test"
+workflows:
+  version: 2
+  "test, build, and relase":
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - test:
+          filters:
+            tags:
+              only: /.*/      
