@@ -46,7 +46,7 @@ jobs:
           command: |
             export KUBECONFIG=$(kind get kubeconfig-path)
             
-            kubectl cluster-info dump
+            cat $KUBECONFIG
   test:
     docker:
       - image: circleci/golang:1.12            
