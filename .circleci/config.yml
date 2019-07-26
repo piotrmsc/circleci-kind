@@ -60,6 +60,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - kind:
+          filters:
+            tags:
+              only: /.*/              
       - test:
           filters:
             tags:
