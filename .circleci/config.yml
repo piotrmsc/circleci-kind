@@ -42,9 +42,11 @@ jobs:
             sudo mv ./kubectl /usr/local/bin/kubectl
       - run: kind create cluster
       - run: 
+          name: test kubectl
           command: |
             export KUBECONFIG=$(kind get kubeconfig-path)
             kubectl cluster-info
+            kubectl get ns
   test:
     docker:
       - image: circleci/golang:1.12            
