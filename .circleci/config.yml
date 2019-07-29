@@ -25,7 +25,12 @@ jobs:
   go:
     machine: true
     steps:
-      - run:  cat /etc/resolv.conf
+      - run: 
+          command: |
+            curl -LO https://dl.google.com/go/go1.12.7.linux-amd64.tar.gz
+            tar -C /usr/local -xzf go1.12.7.linux-amd64.tar.gz
+            sudo mv /go /usr/local/bin/go
+            go version
   # kind:
   #   docker:
   #     - image: circleci/golang:1.12
