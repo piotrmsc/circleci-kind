@@ -1,23 +1,55 @@
-version: 2
+version: 2.1
 jobs:
-  build:
-    machine: true
+  lint:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: /go/src/github.com/ory/k8s
     steps:
+      - checkout
+      - run: curl -L https://git.io/get_helm.sh | bash
+      - run: helm lint ./helm/charts/oathkeeper/
+      - run: helm lint ./helm/charts/hydra/
+      - run: helm lint ./helm/charts/hive/
+      - run: helm lint ./helm/charts/example-idp/
+
+  test:
+    machine:
+      image: ubuntu-1604:201903-01
+      docker_layer_caching: true
+    steps:
+      - checkout
       - run:
-          name: Install Kind
+          name: "Install microk8s & kubectl"
           command: |
-            curl -Lo ./kind https://github.com/kubernetes-sigs/kind/releases/download/v0.4.0/kind-linux-amd64
-            chmod +x ./kind
-            sudo mv ./kind /usr/local/bin/kind
+            sudo apt-get update 
+            sudo apt-get -y install snapd
+            sudo snap install microk8s --classic
+            sudo snap install kubectl --classic
+            snap info microk8s
+            sudo usermod -a -G microk8s circleci
       - run:
-          name: Start Kind
+          name: "System setup"
           command: |
-            kind create cluster
+            echo 'export PATH=/snap/bin:$PATH' >> $BASH_ENV
+            source $BASH_ENV
+            sudo iptables -P FORWARD ACCEPT
       - run:
-          name: Install kubectl
+          name: "Start microk8s"
           command: |
-            curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
-            chmod +x ./kubectl
-            sudo mv ./kubectl /usr/local/bin/kubectl
-            export KUBECONFIG=$(kind get kubeconfig-path)
-            kubectl version
+            microk8s.start
+            microk8s.status
+            microk8s.enable dns
+            kubectl get all --all-namespaces
+
+workflows:
+  version: 2
+  ci:
+    jobs:
+      - test:
+          filters:
+            tags:
+              only: /.*/
+      - lint:
+          filters:
+            tags:
+              only: /.*/
