@@ -38,8 +38,9 @@ jobs:
             sudo microk8s.start
             sudo microk8s.status
             sudo microk8s.enable dns
-            microk8s.enable rbac
+            sudo microk8s.enable rbac
             sudo kubectl get all --all-namespaces
+
            
 
 workflows:
