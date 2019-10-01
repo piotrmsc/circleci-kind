@@ -23,10 +23,9 @@ jobs:
           command: |
             sudo apt-get update 
             sudo apt-get -y install snapd
-            sudo snap install microk8s --classic
+            sudo snap install microk8s --channel=1.14/edge --classic
             sudo snap install kubectl --classic
             snap info microk8s
-            sudo usermod -a -G microk8s circleci
       - run:
           name: "System setup"
           command: |
@@ -36,10 +35,11 @@ jobs:
       - run:
           name: "Start microk8s"
           command: |
-            microk8s.start
-            microk8s.status
-            microk8s.enable dns
-            kubectl get all --all-namespaces
+            sudo microk8s.start
+            sudo microk8s.status
+            sudo microk8s.enable dns
+            sudo kubectl get all --all-namespaces
+            sudo chmod 777 /home/circleci/.kube/config
 
 workflows:
   version: 2
